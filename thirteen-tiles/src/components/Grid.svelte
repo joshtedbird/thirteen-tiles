@@ -42,12 +42,20 @@
 
     $: boundingBox = {
         topLeft: {
-            x: Math.min(...$tiles.map((t) => t.x)),
-            y: Math.min(...$tiles.map((t) => t.y)),
+            x: Math.min(...$tiles.map((t) => t.x), ...$spaces.map((t) => t.x)),
+            y: Math.min(...$tiles.map((t) => t.y), ...$spaces.map((t) => t.y)),
         },
         bottomRight: {
-            x: Math.max(...$tiles.map((t) => t.x)) + 1,
-            y: Math.max(...$tiles.map((t) => t.y)) + 1,
+            x:
+                Math.max(
+                    ...$tiles.map((t) => t.x),
+                    ...$spaces.map((t) => t.x)
+                ) + 1,
+            y:
+                Math.max(
+                    ...$tiles.map((t) => t.y),
+                    ...$spaces.map((t) => t.y)
+                ) + 1,
         },
     }
 

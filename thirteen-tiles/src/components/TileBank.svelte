@@ -28,7 +28,8 @@
 
 <style>
     .area {
-        height: 19rem;
+        width: 100%;
+        aspect-ratio: 5/3;
         background-color: #f8f5ef;
         border-top: 1px solid rgba(0, 0, 0, 0.05);
     }
