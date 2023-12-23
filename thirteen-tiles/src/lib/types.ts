@@ -1,6 +1,12 @@
-type Coord = { x: number; y: number }
+export type Coord = { x: number; y: number }
 
-export type Tile = Coord & {
+export type GridObject = Coord & {
+    id: number
+    value: string
+}
+
+export type BankObject = {
+    id: number
     value: string
 }
 

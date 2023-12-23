@@ -1,11 +1,9 @@
 <script lang="ts">
     import { tweened } from "svelte/motion"
-    import { tiles } from "../lib/store"
+    import { tiles, selected, spaces, letters } from "../lib/store"
     import { cubicInOut } from "svelte/easing"
-    import { getArea, scale } from "../lib/helpers"
-
-    const MAX_WIDTH = 21
-    const OFFSET = Math.floor(MAX_WIDTH / 2)
+    import { getArea, scale, genSpaces } from "../lib/helpers"
+    import type { GridObject } from "../lib/types"
 
     const area = tweened(
         [...getArea({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } })],
@@ -16,14 +14,30 @@
     )
 
     function addTile(x: number, y: number) {
-        tiles.set([
-            ...$tiles,
-            {
-                x: x,
-                y: y,
-                value: "p",
-            },
-        ])
+        if ($selected) {
+            tiles.set([
+                ...$tiles,
+                {
+                    x: x,
+                    y: y,
+                    value: $selected.value,
+                    id: $selected.id,
+                },
+            ])
+
+            letters.set($letters.filter((d) => d.id !== $selected.id))
+            selected.set(null)
+
+            spaces.set(genSpaces())
+        }
+    }
+
+    function removeTile(tile: GridObject) {
+        console.log("dblclick")
+        tiles.set($tiles.filter((d) => d.id !== tile.id))
+        letters.set([...$letters, { id: tile.id, value: tile.value }])
+
+        spaces.set(genSpaces())
     }
 
     $: boundingBox = {
@@ -42,39 +56,38 @@
 
 <div class="container">
     <svg class="grid-canvas" viewBox={$area}>
-        {#each Array(MAX_WIDTH) as _, x}
-            {#each Array(MAX_WIDTH) as _, y}
-                <rect
-                    x={scale(x - OFFSET + 0.05)}
-                    y={scale(y - OFFSET + 0.05)}
-                    height={scale(0.9)}
-                    width={scale(0.9)}
-                    fill={$tiles.filter(
-                        (t) => t.x === x - OFFSET && t.y === y - OFFSET
-                    ).length > 0
-                        ? "rgba(0, 0, 0, 0.1)"
-                        : "rgba(0, 0, 0, 0)"}
-                    on:click={() => addTile(x - OFFSET, y - OFFSET)}
-                />
-                {#if $tiles.filter((t) => t.x === x - OFFSET && t.y === y - OFFSET).length > 0}
-                    <text
-                        x={scale(x - OFFSET + 0.5)}
-                        y={scale(y - OFFSET + 0.62)}
-                        font-size="4"
-                        text-anchor="middle">{"E"}</text
-                    >
-                {/if}
-            {/each}
+        {#each $tiles as tile}
+            <rect
+                x={scale(tile.x + 0.05)}
+                y={scale(tile.y + 0.05)}
+                height={scale(0.9)}
+                width={scale(0.9)}
+                rx={1.5}
+                fill="rgba(255, 255, 255, 1)"
+                on:dblclick={() => removeTile(tile)}
+            />
+            <text
+                x={scale(tile.x + 0.5)}
+                y={scale(tile.y + 0.62)}
+                font-size="4"
+                font-family="monospace"
+                font-weight="bold"
+                text-anchor="middle">{tile.value ? tile.value : ""}</text
+            >
         {/each}
-        <!-- <rect
-            fill="none"
-            stroke="red"
-            stroke-width="1"
-            x={scale(boundingBox.topLeft.x)}
-            y={scale(boundingBox.topLeft.y)}
-            width={scale(boundingBox.bottomRight.x - boundingBox.topLeft.x)}
-            height={scale(boundingBox.bottomRight.y - boundingBox.topLeft.y)}
-        /> -->
+        {#if $selected || $tiles.length === 0}
+            {#each $spaces as space}
+                <rect
+                    x={scale(space.x + 0.1)}
+                    y={scale(space.y + 0.1)}
+                    height={scale(0.8)}
+                    width={scale(0.8)}
+                    rx={1.5}
+                    fill="rgba(0, 0, 0, 0.03)"
+                    on:click={() => addTile(space.x, space.y)}
+                />
+            {/each}
+        {/if}
     </svg>
 </div>
 
