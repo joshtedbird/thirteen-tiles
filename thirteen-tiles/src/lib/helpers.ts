@@ -5,21 +5,28 @@ import { tiles } from "./store"
 const GRID_SIZE = 10
 export const scale = (n: number) => n * GRID_SIZE
 
-const START_WIDTH = 5
-const MIN_LEFT = Math.ceil(START_WIDTH / -2)
-const MIN_RIGHT = Math.ceil(START_WIDTH / 2)
-
 export function getArea(bbox: BoundingBox) {
-    let xMin = Math.min(MIN_LEFT, bbox.topLeft.x)
-    let yMin = Math.min(MIN_LEFT, bbox.topLeft.y)
+    let left = 0
+    let top = 0
 
-    let xMax = Math.max(MIN_RIGHT, bbox.bottomRight.x)
-    let yMax = Math.max(MIN_RIGHT, bbox.bottomRight.y)
+    let width = bbox.bottomRight.x - bbox.topLeft.x
+    let height = bbox.bottomRight.y - bbox.topLeft.y
 
-    let width = xMax - xMin
-    let height = yMax - yMin
+    if (width < 5) {
+        left = bbox.topLeft.x - (5 - width) / 2
+        width = 5
+    } else {
+        left = bbox.topLeft.x
+    }
 
-    return [xMin, yMin, width, height].map((d) => scale(d))
+    if (height < 7) {
+        top = bbox.topLeft.y - (7 - height) / 2
+        height = 7
+    } else {
+        top = bbox.topLeft.y
+    }
+
+    return [left, top, width, height].map((d) => scale(d))
 }
 
 function checkForTile(x: number, y: number, spaces: Coord[]) {
