@@ -37,7 +37,11 @@
         tiles.set($tiles.filter((d) => d.id !== tile.id))
         letters.set([...$letters, { id: tile.id, value: tile.value }])
 
-        spaces.set(genSpaces())
+        if ($tiles.length === 0) {
+            spaces.set([{ x: tile.x, y: tile.y }])
+        } else {
+            spaces.set(genSpaces())
+        }
     }
 
     $: boundingBox = {
