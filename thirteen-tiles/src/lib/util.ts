@@ -1,13 +1,10 @@
-import type { BoundingBox, Coord } from "./types"
+import type { BankObject, BoundingBox, Coord } from "./types"
 import { get } from "svelte/store"
-import { tiles } from "./store"
+import { tiles, letters, numTiles } from "./store"
+import { letterBag } from "./data"
 
 const GRID_SIZE = 10
 export const scale = (n: number) => n * GRID_SIZE
-
-const START_WIDTH = 5
-const MIN_LEFT = Math.ceil(START_WIDTH / -2)
-const MIN_RIGHT = Math.ceil(START_WIDTH / 2)
 
 export function getArea(bbox: BoundingBox) {
     // let xMin = Math.min(MIN_LEFT, bbox.topLeft.x)
@@ -77,4 +74,51 @@ export function genSpaces() {
     }
 
     return output
+}
+
+export function genLetters(n: number) {
+    let output: BankObject[] = []
+    for (let i = 0; i < n; i++) {
+        let index = Math.floor(Math.random() * letterBag.length)
+        output.push({ value: letterBag[index], id: i, position: i })
+    }
+
+    return output
+}
+
+export function shuffleTiles() {
+    let currentLetters = get(letters)
+    let m = currentLetters.length,
+        t,
+        i
+
+    while (m) {
+        i = Math.floor(Math.random() * m--)
+
+        t = currentLetters[m]
+        currentLetters[m] = currentLetters[i]
+        currentLetters[i] = t
+    }
+
+    for (let i = 0; i < currentLetters.length; i++) {
+        currentLetters[i].position = i
+    }
+
+    console.log(currentLetters)
+
+    return currentLetters
+}
+
+export function findFirstSpace() {
+    let min = 0
+    let l = get(letters)
+
+    for (let i = 0; i < numTiles; i++) {
+        if (!l.filter((d) => d.position === i).length) {
+            min = i
+            break
+        }
+    }
+
+    return min
 }

@@ -2,7 +2,7 @@
     import { tweened } from "svelte/motion"
     import { tiles, selected, spaces, letters } from "../lib/store"
     import { cubicInOut } from "svelte/easing"
-    import { getArea, scale, genSpaces } from "../lib/helpers"
+    import { getArea, scale, genSpaces, findFirstSpace } from "../lib/util"
     import type { GridObject } from "../lib/types"
 
     const area = tweened(
@@ -33,9 +33,11 @@
     }
 
     function removeTile(tile: GridObject) {
-        console.log("dblclick")
         tiles.set($tiles.filter((d) => d.id !== tile.id))
-        letters.set([...$letters, { id: tile.id, value: tile.value }])
+        letters.set([
+            ...$letters,
+            { id: tile.id, value: tile.value, position: findFirstSpace() },
+        ])
 
         if ($tiles.length === 0) {
             spaces.set([{ x: tile.x, y: tile.y }])
@@ -80,7 +82,7 @@
             />
             <text
                 x={scale(tile.x + 0.5)}
-                y={scale(tile.y + 0.62)}
+                y={scale(tile.y + 0.64)}
                 font-size="4"
                 font-family="monospace"
                 font-weight="bold"

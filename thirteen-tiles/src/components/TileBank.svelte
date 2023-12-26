@@ -1,5 +1,7 @@
 <script lang="ts">
-    import { letters, selected } from "../lib/store"
+    import { letters, selected, numTiles } from "../lib/store"
+    import { shuffleTiles } from "../lib/util"
+    import Icon from "./Icon.svelte"
     import type { BankObject } from "../lib/types"
 
     const handleSelect = (tile: BankObject) => {
@@ -11,6 +13,10 @@
             selected.set(tile)
         }
     }
+
+    function shuffle() {
+        letters.set(shuffleTiles())
+    }
 </script>
 
 <div class="area">
@@ -18,12 +24,21 @@
         {#each $letters as letter}
             <button
                 class="tile"
+                style="grid-row-start: {Math.ceil(
+                    (letter.position + 1) / 5
+                )}; grid-row-end: {Math.ceil(
+                    (letter.position + 1) / 5 + 1
+                )}; grid-column-start: {(letter.position % 5) +
+                    1}; grid-column-end: {(letter.position % 5) + 2}"
                 on:click={() => handleSelect(letter)}
                 class:selected={$selected ? $selected.id === letter.id : false}
                 >{letter.value}</button
             >
         {/each}
     </div>
+    <button class="iconButton" on:click={() => shuffle()}
+        ><Icon name="shuffle" /></button
+    >
 </div>
 
 <style>
@@ -32,6 +47,7 @@
         aspect-ratio: 5/3;
         background-color: #f8f5ef;
         border-top: 1px solid rgba(0, 0, 0, 0.05);
+        position: relative;
     }
     .cont {
         display: grid;
@@ -57,10 +73,25 @@
         font-weight: bold;
         font-family: monospace;
         box-sizing: border-box;
-        border: 0px solid #e38156;
         transition: border 0.1s;
     }
     .selected {
         border: 4px solid #e38156;
+    }
+    .iconButton {
+        all: unset;
+        height: 2rem;
+        width: 2rem;
+        padding: 0.5rem;
+        opacity: 0.3;
+        border-radius: 0.5rem;
+
+        position: absolute;
+        top: -3.5rem;
+        right: 1rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

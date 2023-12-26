@@ -8,6 +8,7 @@ export type GridObject = Coord & {
 export type BankObject = {
     id: number
     value: string
+    position: number
 }
 
 export type BoundingBox = {

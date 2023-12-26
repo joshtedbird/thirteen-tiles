@@ -1,6 +1,7 @@
 <script lang="ts">
     import Grid from "./components/Grid.svelte"
     import TileBank from "./components/TileBank.svelte"
+    import UtilBar from "./components/UtilBar.svelte"
 
     $: innerHeight = 0
 </script>
